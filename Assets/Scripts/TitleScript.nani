@@ -1,0 +1,15 @@
+@back Street1 time:1 wait:false
+@bgm MainMenuMusic time:1 wait:false
+@stop
+
+# OnNewGame
+@stopBgm fade:1 wait:false
+@stop
+
+# OnLoad
+@wait 0.5
+@stop
+
+# OnExit
+@wait 0.5
+@stop

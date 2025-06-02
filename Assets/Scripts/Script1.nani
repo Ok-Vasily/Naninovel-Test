@@ -1,0 +1,150 @@
+@back Street1 time:1 wait:false
+@bgm GameMusic time:1
+
+@input playerName summary:"Enter your name:"
+@stop
+
+@startQuest
+@char NPC1
+@bokeh focus:NPC1 time:0.15
+NPC1: Hello, {playerName}! I have a quest for you.[addQuestLogEntry "Go to the next location"] Go to the next location and talk to NPC2.
+@bokeh power:0 time:0.15
+@hideChars time:1 wait:false
+@hidePrinter time:1
+
+
+@back School1.DropFade time:1
+@char NPC2
+@addQuestLogEntry "Talk to NPC2"
+@bokeh focus:NPC2 time:0.15
+NPC2: Hi, {playerName}! Let's play a game!
+@bokeh power:0 time:0.15
+
+@hidePrinter time:0.15 wait:false
+@hideUI QuestUI time:0.15 wait:false
+@bokeh dist:10 time:0.15
+@cardGame pairs:4
+@bokeh power:0 time:0.15
+@showUI QuestUI
+
+@char NPC2
+@bokeh focus:NPC2 time:0.15
+NPC2: [addQuestLogEntry "Go to the next location"]Now go to the next location!
+@bokeh power:0 time:0.15
+@hideChars time:1 wait:false
+@hidePrinter time:1
+
+
+@back Room1.DropFade time:1
+@spawn Item pos:50,50
+@addQuestLogEntry "Take the box"
+Click on the item to take it.
+
+# CheckIfHasItem
+@if !hasItem
+@wait 0.1
+@goto .CheckIfHasItem 
+@else
+@sfx ItemReceivedSFX
+@despawn Item params:0.5
+@set isRoomAvailable=false
+@addQuestLogEntry "Return to NPCs"
+@hidePrinter time:1
+
+
+@back School1.DropFade time:1
+Player: No one here...
+Player: They are probably at the first location.
+@hidePrinter time:1
+
+
+@back Street1.DropFade time:1
+@char NPC1 pos:20,0 visible:true scale:0.9 wait:false
+@char NPC2 pos:80,0 visible:true scale:0.9
+
+What will you do with the box?
+@choice "Give it to NPC1" goto:.Choice1
+@choice "Give it to NPC2" goto:.Choice2
+@choice "Keep it for yourself" goto:.Choice3
+@stop
+
+# Choice1
+@set hasItem=false
+
+@bokeh focus:NPC2 time:0.15 wait:false
+@char NPC2.Angry scale:1 time:0.15
+NPC2: I wanted the box!
+@char NPC2 scale:0.9 time:0.15 wait:false
+
+@bokeh focus:NPC1 time:0.15 wait:false
+@char NPC1 scale:1 time:0.15
+NPC1: You've made the right choice!
+@char NPC1 scale:0.9 time:0.15 wait:false
+@bokeh power:0 time:0.15
+
+@goto .EndingSetup
+@stop
+
+# Choice2
+@set hasItem=false
+
+@bokeh focus:NPC1 time:0.15 wait:false
+@char NPC1.Angry scale:1 time:0.15
+NPC1: I needed that box!
+@char NPC1 scale:0.9 time:0.15 wait:false
+
+@bokeh focus:NPC2 time:0.15 wait:false
+@char NPC2 scale:1 time:0.15
+NPC2: Thank you!
+@char NPC2 scale:0.9 time:0.15 wait:false
+@bokeh power:0 time:0.15
+
+@goto .EndingSetup
+@stop
+
+# Choice3
+@blur time:0.15 wait:false
+@char NPC1.Angry scale:1 time:0.15 wait:false
+@char NPC2.Angry scale:1 time:0.15
+@print "You #$^#%$#!!!" author:Together
+@char NPC1 scale:0.9 time:0.15 wait:false
+@char NPC2 scale:0.9 time:0.15 wait:false
+@blur power:0 time:0.15
+
+@goto .EndingSetup
+@stop
+
+# EndingSetup
+@finishQuest
+@stopBgm GameMusic fade:2 wait:false
+@bgm EndingMusic fade:2 wait:false
+@hideChars time:1 wait:false
+@hidePrinter time:1
+
+@if hasItem
+@spawn Rain wait:false
+@sfx RainSFX time:5 wait:false
+@endIf
+
+# Ending
+@choice handler:ButtonArea button:MapButtons/Map goto:.Map
+@stop
+
+# Map
+@back Map
+@choice handler:ButtonArea button:MapButtons/Street pos:300,0 goto:.Street
+@choice handler:ButtonArea button:MapButtons/School pos:-600,250 goto:.School
+@choice handler:ButtonArea button:MapButtons/Room pos:-700,370 goto:.Room
+@stop
+
+# Street
+@back Street1
+@goto .Ending
+
+# School
+@back School1
+@goto .Ending
+
+# Room
+@back Room1
+@goto .Ending
